@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GDG Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f5f7;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* --- HEADER --- */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 24px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo img {
+      height: 64px;        /* Bigger logo */
+      width: auto;
+    }
+
+    .logo-text {
+      font-size: 24px;     /* Title below logo */
+      font-weight: 600;
+      color: #374151;
+      text-align: center;
+    }
+
+    /* subtitle removed */
+    .logo-subtitle {
+      display: none;
+    }
+
+    /* --- MAIN PANEL --- */
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .panel-header-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .panel-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      margin-left: auto;
+      background: #e5f2ff;
+      color: #1e40af;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.agent {
+      margin-right: auto;
+      background: #f3f4f6;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+    }
+
+    .input-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .input-row input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+    }
+
+    .input-row button {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    .input-row button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .quick-actions {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .quick-actions button {
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+
+    .footer-note {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo">
+      <img src="/static/gdg-logo.png" alt="GDG logo" />
+      <div class="logo-text">GDG Agent</div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-header-title">Chat with your agent</div>
+          <div class="panel-header-subtitle">Try commands like:</div>
+          <div class="chips">
+            <span class="chip">Create a LinkedIn post announcing my Agentic AI workshop.</span>
+            <span class="chip">Open the last LinkedIn draft.</span>
+            <span class="chip">List all my drafts.</span>
+            <span class="chip">Close the last draft.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div id="messages" class="messages"></div>
+
+        <div class="quick-actions">
+          <button onclick="useExample('Create a LinkedIn post announcing my Agentic AI demo for GDG students.')">
+            Agentic AI demo post
+          </button>
+          <button onclick="useExample('Open the last LinkedIn draft.')">
+            Open last draft
+          </button>
+          <button onclick="useExample('List all my drafts.')">
+            List drafts
+          </button>
+          <button onclick="useExample('Close the last draft.')">
+            Close last draft
+          </button>
+        </div>
+
+        <div class="input-row">
+          <input
+            id="commandInput"
+            type="text"
+            placeholder="Type a command for GDG Agent..."
+            onkeydown="handleKey(event)"
+          />
+          <button id="sendBtn" onclick="sendCommand()">Send</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const messagesEl = document.getElementById("messages");
+    const inputEl = document.getElementById("commandInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function appendMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = "message " + type;
+      div.textContent = text;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function useExample(text) {
+      inputEl.value = text;
+      inputEl.focus();
+    }
+
+    function handleKey(e) {
+      if (e.key === "Enter") {
+        sendCommand();
+      }
+    }
+
+    async function sendCommand() {
+      const command = inputEl.value.trim();
+      if (!command) return;
+
+      appendMessage(command, "user");
+      inputEl.value = "";
+      inputEl.focus();
+
+      sendBtn.disabled = true;
+      appendMessage("Thinking...", "agent");
+
+      try {
+        const response = await fetch("/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command })
+        });
+
+        const data = await response.json();
+
+        // Remove temporary "Thinking..." bubble
+        const lastChild = messagesEl.lastElementChild;
+        if (lastChild && lastChild.textContent === "Thinking...") {
+          messagesEl.removeChild(lastChild);
+        }
+
+        if (data.log && Array.isArray(data.log)) {
+          data.log.forEach(line => {
+            if (line.startsWith("You:")) return;
+            appendMessage(line.replace(/^Agent:\s*/, ""), "agent");
+          });
+        } else {
+          appendMessage("Unexpected response from server.", "agent");
+        }
+      } catch (err) {
+        appendMessage("Error talking to backend: " + err, "agent");
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>
